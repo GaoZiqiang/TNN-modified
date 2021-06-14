@@ -1,0 +1,1 @@
+platforms：不同平台的调用，包括android、ios、linux和mac
