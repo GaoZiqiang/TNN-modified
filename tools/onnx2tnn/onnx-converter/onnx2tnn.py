@@ -100,10 +100,11 @@ def main():
         output_dir = os.path.dirname(onnx_net_path)
     check_file_exist(onnx_net_path)
     check_file_exist(output_dir)
-    onnx_net_opt_path = onnx_net_path[:-5] + '.opt.onnx'
-    if algo_optimize == '0':
+    # 优化模型重命名
+    onnx_net_opt_path = onnx_net_path[:-5] + '.opt.onnx'# 本质就是重新命名？
+    if algo_optimize == '0':# 不进行模型优化
         onnx_net_opt_path = onnx_net_path
-
+    # 关键就是这个onnx2tnn.convert
     if "convert" not in dir(onnx2tnn):
         print("\nYou should compile onnx2tnn first !!!")
         print("You can find more compilation details in <path-to-tnn>/doc/cn/user/convert.md")
@@ -117,6 +118,7 @@ def main():
     print('onnx_net_opt_path ' + onnx_net_opt_path)
     if algo_optimize != '0':
         print("1.----onnx_optimizer: " + onnx_net_path)
+        # 进行模型优化
         do_optimize(onnx_net_path, input_shape)
 
         if os.path.exists(onnx_net_opt_path) is False:
@@ -131,6 +133,7 @@ def main():
     try:
         if input_shape is None:
             input_shape = ""
+        # 转换工作在这里
         status = onnx2tnn.convert(onnx_net_opt_path, output_dir, algo_version, file_time,
                                   0 if model_half == '0' else 1,
                                   1 if algo_optimize != '0' else 0,
