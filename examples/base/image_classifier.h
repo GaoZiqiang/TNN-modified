@@ -34,6 +34,7 @@ public:
 
 class ImageClassifier : public TNN_NS::TNNSDKSample {
 public:
+    // 对父类TNNSDKSample进行部分重构
     virtual ~ImageClassifier();
     virtual MatConvertParam GetConvertParamForInput(std::string tag = "");
     virtual std::shared_ptr<TNNSDKOutput> CreateSDKOutput();

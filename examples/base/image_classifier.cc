@@ -16,6 +16,7 @@
 #include "sample_timer.h"
 #include <cmath>
 
+// 又一个TNN_NS
 namespace TNN_NS {
 
 ImageClassifierOutput::~ImageClassifierOutput() {}

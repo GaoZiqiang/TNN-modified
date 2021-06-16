@@ -12,6 +12,7 @@
 // CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
 
+#include <iostream>
 #include "tnn_sdk_sample.h"
 #include "sample_timer.h"
 #include "tnn/utils/dims_vector_utils.h"
@@ -552,21 +553,45 @@ void TNNSDKSample::setNpuModelPath(std::string stored_path)
 }
 
 TNN_NS::Status TNNSDKSample::Init(std::shared_ptr<TNNSDKOption> option) {
+    std::cout << "------ Now in TNNSDKSample::Init ------" << std::endl;
+    std::cout << "option in TNNSDKSample:" << option << std::endl;
     option_ = option;
     //网络初始化
     TNN_NS::Status status;
+    // net_哪里来的？ 答：来自tnn_sdk_sample.h
+    // 下面就出问题了
     if (!net_) {
+        std::cout << "------ Now in if(!net_) of TNNSDKSample::Init ------" << std::endl;
         TNN_NS::ModelConfig config;
 #if TNN_SDK_USE_NCNN_MODEL
         config.model_type = TNN_NS::MODEL_TYPE_NCNN;
 #else
         config.model_type = TNN_NS::MODEL_TYPE_TNN;
+        std::cout  << "config.model_type:" << config.model_type << std::endl;
+        // 最终最终问题锁定：出在这里
+        LOGE("config.model_type:%d",config.model_type);
 #endif
-        config.params = {option->proto_content, option->model_content, model_path_str_};
+        // 锁定：问题出在这里 model_path_str_为空字符串
+        std::string temp_model_paht_str = "../../../../model/mobilenet_v2-ssd/mobilenetv2_ssd.tnnmodel";
+        std::cout << "temp_model_paht_str:" << temp_model_paht_str << std::endl;
+//        model_path_str_ = temp_model_paht_str;
+        model_path_str_ = "../../../../model/mobilenet_v2-ssd/mobilenetv2_ssd.tnnmodel";
+        std::cout << "------ model_path_str_ is:" << model_path_str_ << std::endl;
+        // 这里的的params可以只有两个参数
+        config.params = {option->proto_content, option->model_content, temp_model_paht_str};
+        // std::cout << "config.params:" << config.params << std::endl;
+        LOGE("config.params:%s",config.params);
 
         auto net = std::make_shared<TNN_NS::TNN>();
+        LOGE("net:%s",net);
+        // net->Init的返回值为status
         status   = net->Init(config);
+//        using namespace std;
+//        cout << "status:" << status << endl;
+//        LOGE("before status,status is %d",status);
+//        LOGE("before status,int(status) is %d",int(status));
         if (status != TNN_NS::TNN_OK) {
+//            LOGE("before status");
             LOGE("instance.net init failed %d", (int)status);
             return status;
         }
@@ -770,6 +795,7 @@ TNN_NS::Status TNNSDKSample::DumpBlob(const BlobMap& blob_map, std::string outpu
 
 TNN_NS::Status TNNSDKSample::Predict(std::shared_ptr<TNNSDKInput> input, std::shared_ptr<TNNSDKOutput> &output) {
     Status status = TNN_OK;
+    // 若输入为空
     if (!input || input->IsEmpty()) {
         status = Status(TNNERR_PARAM_ERR, "input image is empty ,please check!");
         LOGE("input image is empty ,please check!\n");

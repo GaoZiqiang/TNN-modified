@@ -151,6 +151,7 @@ public:
     virtual ~TNNSDKOutput();
 };
 
+// 封装option的类
 class TNNSDKOption {
 public:
     TNNSDKOption();
