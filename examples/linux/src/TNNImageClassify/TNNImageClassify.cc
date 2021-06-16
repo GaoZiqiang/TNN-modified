@@ -17,7 +17,7 @@
 #include <vector>
 
 #include "image_classifier.h"
-#include "macro.h"
+#include "macro.h"// 宏
 #include "utils/utils.h"
 
 #include "../flags.h"
@@ -35,21 +35,24 @@ static const char label_path_message[] = "(optional) label file path. Default is
 DEFINE_string(l, "../../../assets/synset.txt", label_path_message);
 
 int main(int argc, char** argv) {
+    // 终端参数获取
     if (!ParseAndCheckCommandLine(argc, argv)) {
         ShowUsage(argv[0]);
         printf("\t-l, <label>    \t%s\n", label_path_message);
         return -1;
     }
 
-    // 创建tnn实例
+    // load模型文件
     auto proto_content = fdLoadFile(FLAGS_p.c_str());
     auto model_content = fdLoadFile(FLAGS_m.c_str());
 
+    // std::make_shared 创建管理一个新对象的共享指针 生成的对象拥有并存储指向它的指针
     auto option = std::make_shared<TNNSDKOption>();
     {
         option->proto_content = proto_content;
         option->model_content = model_content;
         option->library_path = "";
+        // 设置Compute Units
         option->compute_units = TNN_NS::TNNComputeUnitsCPU;
         // if enable openvino, set option compute_units to openvino
         // if enable openvino/tensorrt, set option compute_units to openvino/tensorrt
@@ -76,9 +79,9 @@ int main(int argc, char** argv) {
     }
     fclose(fp_label);
 
-    char img_buff[256];
+    char img_buff[256];// 这是啥？
     char *input_imgfn = img_buff;
-    strncpy(input_imgfn, FLAGS_i.c_str(), 256);
+    strncpy(input_imgfn, FLAGS_i.c_str(), 256);// 将FLAGS_i.c_str()复制到input_imgfn
     printf("Classify is about to start, and the picture is %s\n",input_imgfn);
 
     int image_width, image_height, image_channel;
@@ -87,13 +90,15 @@ int main(int argc, char** argv) {
         fprintf(stderr, "ImageClassifier open file %s failed.\n", input_imgfn);
     }
 
+    // 只读入一张
     std::vector<int> nchw = {1, image_channel, image_height, image_width};
 
     //Init
     std::shared_ptr<TNNSDKOutput> sdk_output = predictor->CreateSDKOutput();
     CHECK_TNN_STATUS(predictor->Init(option));
-    //Predict
+    //Predict 进行预测
     auto image_mat = std::make_shared<TNN_NS::Mat>(TNN_NS::DEVICE_NAIVE, TNN_NS::N8UC3, nchw, data);
+    // 最终的预测函数 predictor->Predict()
     CHECK_TNN_STATUS(predictor->Predict(std::make_shared<TNNSDKInput>(image_mat), sdk_output));
 
     int class_id = -1;
@@ -101,7 +106,7 @@ int main(int argc, char** argv) {
         auto classfy_output = dynamic_cast<ImageClassifierOutput *>(sdk_output.get());
         class_id = classfy_output->class_id;
     }
-    //完成计算，获取任意输出点
+    // 完成计算，获取任意输出点
     fprintf(stdout, "Classify done. Result: %sOutput argmax: %d\n", labels[class_id], class_id+1);
     fprintf(stdout, "%s\n", predictor->GetBenchResult().Description().c_str());
     free(data);

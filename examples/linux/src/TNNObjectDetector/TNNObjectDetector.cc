@@ -32,15 +32,30 @@
 #include "../../../../third_party/stb/stb_image_write.h"
 
 int main(int argc, char **argv) {
+    std::cout << "===>Object Detecting Beginning" << std::endl;
     if (!ParseAndCheckCommandLine(argc, argv)) {
         ShowUsage(argv[0]);
         return -1;
     }
 
     auto proto_content = fdLoadFile(FLAGS_p.c_str());
-    auto model_content = fdLoadFile(FLAGS_m.c_str());
+    std::cout << "FLAGS_p.c_str():" << FLAGS_p.c_str() << std::endl;
+//    if (proto_content.length() > 0) {
+//        std::cout << "proto_content:" << proto_content << std::endl;
+//    }else{
+//        std::cout << "proto_content is null" << std::endl;
+//    }
 
-    auto option = std::make_shared<TNN_NS::TNNSDKOption>();
+    auto model_content = fdLoadFile(FLAGS_m.c_str());
+    std::cout << "FLAGS_m.c_str():" << FLAGS_m.c_str() << std::endl;
+//    if (model_content.length() > 0) {
+//        std::cout << "model_content:" << model_content << std::endl;
+//    }else{
+//        std::cout << "model_content is null" << std::endl;
+//    }
+//    std::cout << "model_content:" << model_content << std::endl;
+
+    auto option = std::make_shared<TNN_NS::TNNSDKOption>();// option是个地址
     {
         option->proto_content = proto_content;
         option->model_content = model_content;
@@ -53,8 +68,14 @@ int main(int argc, char **argv) {
         #endif
     }
 
+//    std::cout << "option->proto_content:" << option->proto_content << std::endl;
+    // compute_units是0 答：TNNComputeUnitsCPU = 0
+//    std::cout << "option->compute_units:" << option->compute_units << std::endl;
     char img_buff[256];
+    // img_buff和input_imgfn为空
+//    std::cout << "img_buff" << img_buff << std::endl;
     char* input_imgfn = img_buff;
+//    std::cout << "input_imgfn:" << input_imgfn << std::endl;
     strncpy(input_imgfn, FLAGS_i.c_str(), 256);
 
     int image_width, image_height, image_channel;
@@ -66,8 +87,21 @@ int main(int argc, char **argv) {
     }
 
     auto predictor = std::make_shared<TNN_NS::ObjectDetectorSSD>();
+    // 问题出在这？
+    // 答：option有问题
+
+
+    // 或者问题出在option的地址越界之类的问题
+    // 问题来了：怎么判断是否内存越界？
+    // 问题出在这？Init()这里 TNN_NS::ObjectDetectorSSD的Init有问题
+//    std::cout << "------ Now before Init ------" << std::endl;
+//    std::cout << "option before Init:" << option << std::endl;
     auto status = predictor->Init(option);
+//    LOGE("instance.net init failed %d", (int)status);
+//    std::cout << "status:" << status << std::endl;
+    // 问题就是出在这
     if (status != TNN_NS::TNN_OK) {
+        LOGE("instance.net init failed %d", (int)status);
         std::cout << "Predictor Initing failed, please check the option parameters" << std::endl;
     }
 
