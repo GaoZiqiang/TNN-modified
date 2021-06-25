@@ -168,8 +168,9 @@ struct PUBLIC NetworkConfig {
     bool enable_tune_kernel = false;
 };
 
+// model configuration
 struct PUBLIC ModelConfig {
-    ModelType model_type = MODEL_TYPE_TNN;
+    ModelType model_type = MODEL_TYPE_TNN;// model type
 
     // tnn model need two params: order is proto content, model content.
     // ncnn need two: params: order is param, weights.
@@ -178,7 +179,7 @@ struct PUBLIC ModelConfig {
     // snpe model need one param: dlc model dir.
     // hiai model need two params: order is model name, model_file_path.
     // atlas model need one param: config string.
-    std::vector<std::string> params = {};
+    std::vector<std::string> params = {};// model params
 };
 
 typedef enum {
