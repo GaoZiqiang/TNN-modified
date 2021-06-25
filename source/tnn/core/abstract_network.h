@@ -79,6 +79,7 @@ public:
     virtual Status ForwardWithCallback(BlobStatisticCallback before, BlobStatisticCallback after);
 #endif  // end of FORWARD_CALLBACK_ENABLE
 
+    // ForwardAsync最终锁定这里
     // @brief tnn instance network infer, it will not wait
     virtual Status ForwardAsync(Callback call_back) = 0;
 

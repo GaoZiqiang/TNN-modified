@@ -62,7 +62,6 @@ public:
     virtual std::shared_ptr<Instance> CreateInst(NetworkConfig& config, Status& status,
                                                  InputShapesMap inputs_shape = InputShapesMap()) = 0;
 
-
     // @brief create an instance
     // @param instance: The instance to be created.
     // @param min_inputs_shape: support min shape
