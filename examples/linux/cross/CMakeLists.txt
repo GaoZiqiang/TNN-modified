@@ -29,10 +29,10 @@ get_target_property(GFLAGS_INCLUDE_DIRS gflags INTERFACE_INCLUDE_DIRECTORIES)
 include_directories(BEFORE "${GFLAGS_INCLUDE_DIRS}")
 link_libraries(gflags)
 
-file(GLOB FLAG_SRC "${CMAKE_SOURCE_DIR}/../src/*.cc")
+file(GLOB FLAG_SRC "${CMAKE_SOURCE_DIR}/../src/*.cc")# 所有flags依赖
 
-file(GLOB_RECURSE BASE_SRC "${CMAKE_SOURCE_DIR}/../../base/*.cc")
-file(GLOB_RECURSE UTIL_SRC "${CMAKE_SOURCE_DIR}/../../utils/*.cc")
+file(GLOB_RECURSE BASE_SRC "${CMAKE_SOURCE_DIR}/../../base/*.cc")# 所有可用依赖
+file(GLOB_RECURSE UTIL_SRC "${CMAKE_SOURCE_DIR}/../../utils/*.cc")# 所有utils依赖
 
 add_definitions(-D_ARM_)
 add_executable(demo_arm_imageclassify ../src/TNNImageClassify/TNNImageClassify.cc ${BASE_SRC} ${UTIL_SRC} ${FLAG_SRC})
