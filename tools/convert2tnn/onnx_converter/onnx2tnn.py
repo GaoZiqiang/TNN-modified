@@ -114,9 +114,11 @@ def convert(onnx_path, output_dir=None, version="v1.0", optimize=True, half=Fals
     logging.debug("The onnx2tnn command:" + command + "\n")
 
     work_dir = "../onnx2tnn/onnx-converter/"
+    print("command:",command)
+    ### onnx2tnn.py当前目录下没有这个文件怎么执行？
     result = cmd.run(command, work_dir=work_dir)
 
-    if result == 0:
+    if result == 0:# 这个result怎么看？
         logging.info("Converter ONNX to TNN model succeed!\n")
     else:
         logging.error("Converter ONNX to TNN model failed!\n")
